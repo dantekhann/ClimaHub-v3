@@ -72,14 +72,22 @@ async function buscarClimaReal() {
 
   if (cidade === "") return alert("Digite o nome de uma cidade!");
 
+  const controller = new AbortController();
+  // Aumentei para 10 segundos para dar mais folga no seu teste
+  const timeoutId = setTimeout(() => controller.abort(), 10000); 
+
   btn.disabled = true;
   btn.innerText = "Consultando...";
   container.innerHTML = "";
 
   try {
+    console.log("Iniciando busca para:", cidade);
+
     const geoRes = await fetch(
       `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cidade)}&count=1&language=pt&format=json`,
+      { signal: controller.signal }
     );
+    
     const geoData = await geoRes.json();
     if (!geoData.results) throw new Error("Cidade não encontrada!");
 
@@ -87,21 +95,21 @@ async function buscarClimaReal() {
 
     const weatherRes = await fetch(
       `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`,
+      { signal: controller.signal }
     );
     const weatherData = await weatherRes.json();
 
-    const data = weatherData.current_weather;
-    const config = weatherConfig[data.weathercode] || {
-      label: "Estável",
-      icon: "🌤️",
-      color: "var(--destaque)",
-      msg: "Aproveite o dia!",
-    };
+    // SUCESSO: Desliga o cronômetro
+    clearTimeout(timeoutId);
+    console.log("Busca concluída com sucesso!");
 
+  
+    // [Mantenha a parte do card que você já tem]
+    const data = weatherData.current_weather;
+    const config = weatherConfig[data.weathercode] || { label: "Estável", icon: "🌤️", color: "var(--destaque)", msg: "Aproveite o dia!" };
     const card = document.createElement("div");
     card.className = "alerta-moderno";
     card.style.borderLeftColor = config.color;
-
     card.innerHTML = `
             <span class="weather-icon-main">${config.icon}</span>
             <h2 style="margin:0; font-size: 0.9rem; color: var(--texto-suave);">${name}, ${admin1 || ""} - ${country}</h2>
@@ -111,14 +119,16 @@ async function buscarClimaReal() {
             <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 15px 0;">
             <p>${config.msg}</p>
         `;
-
     container.appendChild(card);
+
   } catch (erro) {
-    // Verifica se o erro é de conexão ou se o navegador está offline
-    if (!navigator.onLine || erro.message === "Failed to fetch") {
-      container.innerHTML = `<p style="color: var(--perigo); text-align: center;">Sem conexão com a internet. Verifique seu sinal.</p>`;
+    console.error("Erro capturado:", erro.name, erro.message); // Isso vai te dizer o problema no F12
+
+    if (erro.name === 'AbortError') {
+      container.innerHTML = `<p style="color: var(--perigo); text-align: center;">A conexão demorou muito. Tente de novo.</p>`;
+    } else if (!navigator.onLine || erro.message === "Failed to fetch") {
+      container.innerHTML = `<p style="color: var(--perigo); text-align: center;">Sem internet!</p>`;
     } else {
-      // Para outros erros (ex: cidade não encontrada)
       container.innerHTML = `<p style="color: var(--perigo); text-align: center;">${erro.message}</p>`;
     }
   } finally {
