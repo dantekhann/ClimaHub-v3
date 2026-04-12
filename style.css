@@ -88,15 +88,13 @@ h1 strong {
 }
 
 /* --- CARD DE RESULTADO (Estilo do Print) --- */
-.alerta-moderno {
-  background: var(--card);
-  border-left: 6px solid var(--destaque);
-  padding: 30px;
-  border-radius: 20px;
-  text-align: left; /* Conteúdo interno alinhado à esquerda como no print */
-  margin-bottom: 20px;
-  position: relative;
-  animation: fadeIn 0.4s ease;
+.alerta-moderno h2 {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word; /* Força a quebra em nomes gigantes */
+    line-height: 1.2;
+    display: block;
+    max-width: 80%; /* Abre espaço para o ícone do clima na direita */
 }
 
 .skeleton {
@@ -147,6 +145,9 @@ h1 strong {
   margin: 15px 0;
 }
 
+/* --- ANIMAÇÕES --- */
+
+/* Animação de entrada do Card */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -156,4 +157,64 @@ h1 strong {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Efeito de carregamento pulsante (Skeleton) */
+.skeleton {
+    width: 100%;
+    height: 250px; 
+    background: #1e1e26;
+    background-image: linear-gradient(
+        90deg, 
+        #1e1e26 0px, 
+        #2a2a35 40px, 
+        #1e1e26 80px
+    );
+    background-size: 200% 100%;
+    border-radius: 20px;
+    margin-bottom: 40px; 
+    animation: skeleton-pulse 1.5s infinite linear;
+}
+
+@keyframes skeleton-pulse {
+    0% { background-position: 100% 0; }
+    100% { background-position: -100% 0; }
+}
+/* --- LISTA DE SELEÇÃO (Cidades Homônimas) --- */
+
+.lista-selecao {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 25px; /* Respiro antes do botão */
+    animation: fadeIn 0.3s ease;
+    width: 100%;
+}
+
+.item-local {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+}
+
+.item-local:hover {
+    background: rgba(0, 210, 255, 0.08);
+    border-color: var(--destaque);
+    transform: translateX(5px); /* Pequeno feedback de movimento */
+}
+
+.item-local strong {
+    display: block;
+    color: var(--texto);
+    font-size: 1rem;
+    margin-bottom: 4px;
+}
+
+.item-local span {
+    color: var(--texto-suave);
+    font-size: 0.85rem;
 }
