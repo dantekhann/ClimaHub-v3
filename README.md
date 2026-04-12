@@ -27,5 +27,3 @@ git clone [https://github.com/SEU-USUARIO/meu-clima-v2.git](https://github.com/S
 Paulo Dante Coelho Neto
 
 Economista e Analista Financeiro explorando o mundo do desenvolvimento.
-
-GitHub
